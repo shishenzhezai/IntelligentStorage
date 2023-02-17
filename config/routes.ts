@@ -27,6 +27,43 @@ export default [
     component: './Welcome',
   },
   {
+    path: '/keepstorage',
+    name: 'keepstorage',
+    icon: '',
+    routes: [
+      {
+        path: '/keepstorage',
+        redirect: '/keepstorage/bloodpacking',
+      },
+      {
+        path: '/keepstorage/bloodpacking',
+        name: 'bloodpacking',
+        component: './KeepStorage/BloodPacking',
+      },
+    ],
+  },
+  {
+    path: '/systemmanage',
+    name: 'systemmanage',
+    icon: '',
+    routes: [
+      {
+        path: '/systemmanage',
+        redirect: '/systemmange/bloodbox',
+      },
+      {
+        path: '/systemmanage/bloodbox',
+        name: 'bloodbox',
+        component: './SystemManage/BloodBox',
+      },
+      {
+        path: '/systemmanage/bloodfridge',
+        name: 'bloodfridge',
+        component: './SystemManage/BloodFridge',
+      },
+    ],
+  },
+  {
     path: '/admin',
     name: 'admin',
     icon: 'crown',
