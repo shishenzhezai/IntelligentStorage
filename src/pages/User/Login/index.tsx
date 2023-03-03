@@ -90,7 +90,7 @@ const Login: React.FC = () => {
       </div>
       <div className={styles.content}>
         <LoginForm
-          logo={<img alt="logo" src="/logo.svg" />}
+          logo={<img alt="logo" src="/icon_SMS.svg" />}
           title="智能血库出入库管理系统"
           // subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           initialValues={{
