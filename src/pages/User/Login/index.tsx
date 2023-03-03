@@ -1,14 +1,6 @@
-import Footer from '@/components/Footer';
 import { login } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
-import {
-  AlipayCircleOutlined,
-  LockOutlined,
-  MobileOutlined,
-  TaobaoCircleOutlined,
-  UserOutlined,
-  WeiboCircleOutlined,
-} from '@ant-design/icons';
+import { LockOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons';
 import {
   LoginForm,
   ProFormCaptcha,
@@ -16,7 +8,7 @@ import {
   ProFormText,
 } from '@ant-design/pro-components';
 import { FormattedMessage, history, SelectLang, useIntl, useModel } from '@umijs/max';
-import { Alert, message, Tabs } from 'antd';
+import { Alert, message, Popover, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
 import styles from './index.less';
@@ -35,6 +27,12 @@ const LoginMessage: React.FC<{
     />
   );
 };
+
+const forgePwdPoverContent = (
+  <div>
+    <p>请联系管理员</p>
+  </div>
+);
 
 const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
@@ -82,6 +80,7 @@ const Login: React.FC = () => {
       message.error(defaultLoginFailureMessage);
     }
   };
+
   const { status, type: loginType } = userLoginState;
 
   return (
@@ -92,21 +91,23 @@ const Login: React.FC = () => {
       <div className={styles.content}>
         <LoginForm
           logo={<img alt="logo" src="/logo.svg" />}
-          title="Ant Design"
-          subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
+          title="智能血库出入库管理系统"
+          // subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           initialValues={{
             autoLogin: true,
           }}
-          actions={[
-            <FormattedMessage
-              key="loginWith"
-              id="pages.login.loginWith"
-              defaultMessage="其他登录方式"
-            />,
-            <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.icon} />,
-            <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.icon} />,
-            <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.icon} />,
-          ]}
+          actions={
+            [
+              // <FormattedMessage
+              //   key="loginWith"
+              //   id="pages.login.loginWith"
+              //   defaultMessage="其他登录方式"
+              // />,
+              // <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.icon} />,
+              // <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.icon} />,
+              // <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.icon} />,
+            ]
+          }
           onFinish={async (values) => {
             await handleSubmit(values as API.LoginParams);
           }}
@@ -123,13 +124,13 @@ const Login: React.FC = () => {
                   defaultMessage: '账户密码登录',
                 }),
               },
-              {
-                key: 'mobile',
-                label: intl.formatMessage({
-                  id: 'pages.login.phoneLogin.tab',
-                  defaultMessage: '手机号登录',
-                }),
-              },
+              // {
+              //   key: 'mobile',
+              //   label: intl.formatMessage({
+              //     id: 'pages.login.phoneLogin.tab',
+              //     defaultMessage: '手机号登录',
+              //   }),
+              // },
             ]}
           />
 
@@ -137,7 +138,7 @@ const Login: React.FC = () => {
             <LoginMessage
               content={intl.formatMessage({
                 id: 'pages.login.accountLogin.errorMessage',
-                defaultMessage: '账户或密码错误(admin/ant.design)',
+                defaultMessage: '账户或密码错误',
               })}
             />
           )}
@@ -151,7 +152,7 @@ const Login: React.FC = () => {
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.username.placeholder',
-                  defaultMessage: '用户名: admin or user',
+                  defaultMessage: '用户名: ',
                 })}
                 rules={[
                   {
@@ -173,7 +174,7 @@ const Login: React.FC = () => {
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.password.placeholder',
-                  defaultMessage: '密码: ant.design',
+                  defaultMessage: '密码:',
                 })}
                 rules={[
                   {
@@ -280,17 +281,19 @@ const Login: React.FC = () => {
             <ProFormCheckbox noStyle name="autoLogin">
               <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
             </ProFormCheckbox>
-            <a
-              style={{
-                float: 'right',
-              }}
-            >
-              <FormattedMessage id="pages.login.forgotPassword" defaultMessage="忘记密码" />
-            </a>
+            <Popover placement="bottom" content={forgePwdPoverContent} trigger="['hover','click']">
+              <a
+                style={{
+                  float: 'right',
+                }}
+              >
+                <FormattedMessage id="pages.login.forgotPassword" defaultMessage="忘记密码" />
+              </a>
+            </Popover>
           </div>
         </LoginForm>
       </div>
-      <Footer />
+      {/* <Footer /> */}
     </div>
   );
 };
