@@ -49,4 +49,9 @@ export default {
   'menu.editor.flow': '流程编辑器',
   'menu.editor.mind': '脑图编辑器',
   'menu.editor.koni': '拓扑编辑器',
+  'menu.keepstorage': '血袋管理',
+  'menu.keepstorage.bloodpacking': '血袋入库',
+  'menu.systemmanage': '系统管理',
+  'menu.systemmanage.bloodbox': '血袋盒管理',
+  'menu.systemmanage.bloodfridge': '冰箱管理',
 };

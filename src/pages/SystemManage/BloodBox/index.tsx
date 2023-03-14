@@ -1,7 +1,7 @@
 import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
-import { Button, Dropdown } from 'antd';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
+import { Button, Dropdown } from 'antd';
 import React, { useRef } from 'react';
 
 import styles from './index.less';
@@ -120,6 +120,8 @@ const columns: ProColumns<BloodBoxItem>[] = [
 
 const BloodBox: React.FC = () => {
   const actionRef = useRef<ActionType>();
+  const addBox_btn = () => {};
+
   return (
     <ProTable<BloodBoxItem>
       columns={columns}
@@ -171,7 +173,7 @@ const BloodBox: React.FC = () => {
       dateFormatter="string"
       headerTitle="血袋盒列表"
       toolBarRender={() => [
-        <Button key="button" icon={<PlusOutlined />} type="primary">
+        <Button key="button" icon={<PlusOutlined />} type="primary" onClick={addBox_btn}>
           新建
         </Button>,
         <Dropdown
