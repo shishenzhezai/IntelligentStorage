@@ -34,11 +34,53 @@ type BloodItem = {
   sl: string; //数量
 };
 
+const defaultBoxData: BloodBoxItem[] = [
+  {
+    boxid: 1,
+    rfid: '001',
+    mintemp: -20,
+    maxtemp: 60,
+    temp: 20,
+    islock: 0,
+    isout: 0,
+    status: 0,
+    batterypower: 90,
+    ischarge: 1,
+    isalert: 0,
+  },
+  {
+    boxid: 2,
+    rfid: '002',
+    mintemp: -20,
+    maxtemp: 60,
+    temp: 70,
+    islock: 0,
+    isout: 0,
+    status: 0,
+    batterypower: 90,
+    ischarge: 1,
+    isalert: 0,
+  },
+  {
+    boxid: 3,
+    rfid: '003',
+    mintemp: -20,
+    maxtemp: 90,
+    temp: -40,
+    islock: 0,
+    isout: 0,
+    status: 0,
+    batterypower: 90,
+    ischarge: 1,
+    isalert: 0,
+  },
+];
+
 const columnsBloodBoxItem: ProColumns<BloodBoxItem>[] = [
   {
-    dataIndex: 'index',
-    valueType: 'indexBorder',
-    width: 48,
+    dataIndex: 'boxid',
+    valueType: 'index',
+    ellipsis: true,
   },
   {
     title: 'RHID',
@@ -58,43 +100,38 @@ const columnsBloodBoxItem: ProColumns<BloodBoxItem>[] = [
   {
     title: '温度',
     dataIndex: 'temp',
-    copyable: true,
     ellipsis: true,
     renderFormItem: (_, { defaultRender }) => {
       return defaultRender(_);
     },
     render: (_, record) => {
       if (record.temp > record.maxtemp) {
-        return <span className={styles.hightemp}>record.temp</span>;
+        return <span className={styles.hightemp}>{record.temp}</span>;
       } else if (record.temp < record.mintemp) {
-        return <span className={styles.lowtemp}>record.temp</span>;
+        return <span className={styles.lowtemp}>{record.temp}</span>;
       } else {
-        return <span>record.temp</span>;
+        return <span>{record.temp}</span>;
       }
     },
   },
   {
     title: '电量',
     dataIndex: 'batterypower',
-    copyable: true,
     ellipsis: true,
   },
   {
     title: '开锁状态',
     dataIndex: 'islock',
-    copyable: true,
     ellipsis: true,
   },
   {
     title: '出库状态',
     dataIndex: 'isout',
-    copyable: true,
     ellipsis: true,
   },
   {
     title: '充电状态',
     dataIndex: 'ischarge',
-    copyable: true,
     ellipsis: true,
   },
   {
@@ -133,7 +170,7 @@ const columnsBloodBoxItem: ProColumns<BloodBoxItem>[] = [
 ];
 const columnsBloodItem: ProColumns<BloodItem>[] = [
   {
-    dataIndex: 'index',
+    dataIndex: 'boxid',
     valueType: 'indexBorder',
     width: 48,
   },
@@ -237,6 +274,16 @@ const BloodPacking: React.FC = () => {
 
   const setDataSource = () => {};
 
+  const rowSelection = {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+      console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
+    },
+    getCheckboxProps: (record: DataType) => ({
+      disabled: record.name === 'Disabled User', // Column configuration not to be checked
+      name: record.name,
+    }),
+  };
+
   return (
     <div>
       <ProTable<BloodBoxItem>
@@ -244,6 +291,7 @@ const BloodPacking: React.FC = () => {
         actionRef={actionRef}
         search={false}
         cardBordered
+        defaultData={defaultBoxData}
         request={async (params = {}, sort, filter) => {
           console.log(sort, filter);
           return request<{
@@ -255,6 +303,10 @@ const BloodPacking: React.FC = () => {
         editable={{
           type: 'multiple',
         }}
+        rowSelection={{
+          type: 'checkbox',
+          ...rowSelection,
+        }}
         columnsState={{
           persistenceKey: 'pro-table-singe-demos',
           persistenceType: 'localStorage',
@@ -262,7 +314,7 @@ const BloodPacking: React.FC = () => {
             console.log('value: ', value);
           },
         }}
-        rowKey="id"
+        rowKey="boxid"
         options={{
           setting: {
             listsHeight: 400,
@@ -324,7 +376,14 @@ const BloodPacking: React.FC = () => {
         cardBordered
       />
 
-      <Modal title="血袋入库" open={isModalOpen} onOk={handleOk} onCancel={handleCancel}>
+      <Modal
+        title="血袋入库"
+        open={isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        width={1000}
+        centered
+      >
         <Form
           name="bloodIn"
           labelCol={{ span: 8 }}

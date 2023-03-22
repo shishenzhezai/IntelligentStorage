@@ -51,7 +51,7 @@ export default {
   'menu.editor.koni': '拓扑编辑器',
   'menu.keepstorage': '血袋管理',
   'menu.keepstorage.bloodpacking': '血袋入库',
-  'menu.systemmanage': '系统管理',
-  'menu.systemmanage.bloodbox': '血袋盒管理',
-  'menu.systemmanage.bloodfridge': '冰箱管理',
+  'menu.hosmanage': '医院管理',
+  'menu.hosmanage.bloodbox': '血袋盒管理',
+  'menu.hosmanage.bloodfridge': '冰箱管理',
 };

@@ -43,23 +43,23 @@ export default [
     ],
   },
   {
-    path: '/systemmanage',
-    name: 'systemmanage',
+    path: '/hosmanage',
+    name: 'hosmanage',
     icon: '',
     routes: [
       {
-        path: '/systemmanage',
-        redirect: '/systemmange/bloodbox',
+        path: '/hosmanage',
+        redirect: '/hosmanage/bloodbox',
       },
       {
-        path: '/systemmanage/bloodbox',
+        path: '/hosmanage/bloodbox',
         name: 'bloodbox',
-        component: './SystemManage/BloodBox',
+        component: './HosManage/BloodBox',
       },
       {
-        path: '/systemmanage/bloodfridge',
+        path: '/hosmanage/bloodfridge',
         name: 'bloodfridge',
-        component: './SystemManage/BloodFridge',
+        component: './HosManage/BloodFridge',
       },
     ],
   },
