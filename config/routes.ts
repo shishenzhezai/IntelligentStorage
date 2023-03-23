@@ -63,6 +63,27 @@ export default [
       },
     ],
   },
+  {
+    path: '/sysmanage',
+    name: 'sysmanage',
+    icon: '',
+    routes: [
+      {
+        path: '/sysmanage',
+        redirect: '/sysmanage/user',
+      },
+      {
+        path: '/sysmanage/role',
+        name: 'role',
+        component: './SysManage/RoleManage',
+      },
+      {
+        path: '/sysmanage/user',
+        name: 'user',
+        component: './SysManage/UserManage',
+      },
+    ],
+  },
   // {
   //   path: '/admin',
   //   name: 'admin',
