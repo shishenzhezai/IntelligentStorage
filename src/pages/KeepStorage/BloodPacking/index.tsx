@@ -10,6 +10,14 @@ import { Button, Card, Dropdown, Form, Input, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import styles from './index.less';
 
+const waitTime = (time: number = 100) => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve(true);
+    }, time);
+  });
+};
+
 type BloodBoxItem = {
   boxid: number;
   rfid: string;
@@ -246,7 +254,7 @@ const BloodPacking: React.FC = () => {
   const [editableKeys, setEditableRowKeys] = useState<React.Key[]>([]);
   const actionRef = useRef<ActionType>();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [position, setPosition] = useState<'top' | 'bottom' | 'hidden'>('bottom');
+
   const showModal = () => {
     setIsModalOpen(true);
   };
@@ -408,14 +416,14 @@ const BloodPacking: React.FC = () => {
             scroll={{
               x: 960,
             }}
-            recordCreatorProps={
-              position !== 'hidden'
-                ? {
-                    position: position as 'top',
-                    record: () => ({ id: (Math.random() * 1000000).toFixed(0) }),
-                  }
-                : false
-            }
+            // recordCreatorProps={
+            //   position !== 'hidden'
+            //     ? {
+            //         position: position as 'top',
+            //         record: () => ({ id: (Math.random() * 1000000).toFixed(0) }),
+            //       }
+            //     : false
+            // }
             loading={false}
             toolBarRender={() => []}
             columns={columnsBloodItem}

@@ -7,11 +7,58 @@ import {
   ProFormCheckbox,
   ProFormText,
 } from '@ant-design/pro-components';
-import { FormattedMessage, history, SelectLang, useIntl, useModel } from '@umijs/max';
+import { useEmotionCss } from '@ant-design/use-emotion-css';
+import { FormattedMessage, Helmet, history, SelectLang, useIntl, useModel } from '@umijs/max';
 import { Alert, message, Popover, Tabs } from 'antd';
 import React, { useState } from 'react';
 import { flushSync } from 'react-dom';
-import styles from './index.less';
+import Settings from '../../../../config/defaultSettings';
+
+// const ActionIcons = () => {
+//   const langClassName = useEmotionCss(({ token }) => {
+//     return {
+//       marginLeft: '8px',
+//       color: 'rgba(0, 0, 0, 0.2)',
+//       fontSize: '24px',
+//       verticalAlign: 'middle',
+//       cursor: 'pointer',
+//       transition: 'color 0.3s',
+//       '&:hover': {
+//         color: token.colorPrimaryActive,
+//       },
+//     };
+//   });
+
+//   return (
+//     <>
+//       <AlipayCircleOutlined key="AlipayCircleOutlined" className={langClassName} />
+//       <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={langClassName} />
+//       <WeiboCircleOutlined key="WeiboCircleOutlined" className={langClassName} />
+//     </>
+//   );
+// };
+
+const Lang = () => {
+  const langClassName = useEmotionCss(({ token }) => {
+    return {
+      width: 42,
+      height: 42,
+      lineHeight: '42px',
+      position: 'fixed',
+      right: 16,
+      borderRadius: token.borderRadius,
+      ':hover': {
+        backgroundColor: token.colorBgTextHover,
+      },
+    };
+  });
+
+  return (
+    <div className={langClassName} data-lang>
+      {SelectLang && <SelectLang />}
+    </div>
+  );
+};
 
 const LoginMessage: React.FC<{
   content: string;
@@ -27,17 +74,27 @@ const LoginMessage: React.FC<{
     />
   );
 };
-
 const forgePwdPoverContent = (
   <div>
     <p>请联系管理员</p>
   </div>
 );
-
 const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
+
+  const containerClassName = useEmotionCss(() => {
+    return {
+      display: 'flex',
+      flexDirection: 'column',
+      height: '100vh',
+      overflow: 'auto',
+      backgroundImage:
+        "url('https://mdn.alipayobjects.com/yuyan_qk0oxh/afts/img/V-_oS6r-i7wAAAAAAAAAAAAAFl94AQBr')",
+      backgroundSize: '100% 100%',
+    };
+  });
 
   const intl = useIntl();
 
@@ -80,19 +137,34 @@ const Login: React.FC = () => {
       message.error(defaultLoginFailureMessage);
     }
   };
-
   const { status, type: loginType } = userLoginState;
 
   return (
-    <div className={styles.container}>
-      <div className={styles.lang} data-lang>
-        {SelectLang && <SelectLang />}
-      </div>
-      <div className={styles.content}>
+    <div className={containerClassName}>
+      <Helmet>
+        <title>
+          {intl.formatMessage({
+            id: 'menu.login',
+            defaultMessage: '登录页',
+          })}
+          - {Settings.title}
+        </title>
+      </Helmet>
+      <Lang />
+      <div
+        style={{
+          flex: '1',
+          padding: '32px 0',
+        }}
+      >
         <LoginForm
+          contentStyle={{
+            minWidth: 280,
+            maxWidth: '75vw',
+          }}
           logo={<img alt="logo" src="/icon_SMS.svg" />}
           title="智能血库出入库管理系统"
-          // subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
+          //subTitle={intl.formatMessage({ id: 'pages.layouts.userLayout.title' })}
           initialValues={{
             autoLogin: true,
           }}
@@ -103,9 +175,7 @@ const Login: React.FC = () => {
               //   id="pages.login.loginWith"
               //   defaultMessage="其他登录方式"
               // />,
-              // <AlipayCircleOutlined key="AlipayCircleOutlined" className={styles.icon} />,
-              // <TaobaoCircleOutlined key="TaobaoCircleOutlined" className={styles.icon} />,
-              // <WeiboCircleOutlined key="WeiboCircleOutlined" className={styles.icon} />,
+              // <ActionIcons key="icons" />,
             ]
           }
           onFinish={async (values) => {
@@ -148,7 +218,7 @@ const Login: React.FC = () => {
                 name="username"
                 fieldProps={{
                   size: 'large',
-                  prefix: <UserOutlined className={styles.prefixIcon} />,
+                  prefix: <UserOutlined />,
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.username.placeholder',
@@ -170,7 +240,7 @@ const Login: React.FC = () => {
                 name="password"
                 fieldProps={{
                   size: 'large',
-                  prefix: <LockOutlined className={styles.prefixIcon} />,
+                  prefix: <LockOutlined />,
                 }}
                 placeholder={intl.formatMessage({
                   id: 'pages.login.password.placeholder',
@@ -197,7 +267,7 @@ const Login: React.FC = () => {
               <ProFormText
                 fieldProps={{
                   size: 'large',
-                  prefix: <MobileOutlined className={styles.prefixIcon} />,
+                  prefix: <MobileOutlined />,
                 }}
                 name="mobile"
                 placeholder={intl.formatMessage({
@@ -228,7 +298,7 @@ const Login: React.FC = () => {
               <ProFormCaptcha
                 fieldProps={{
                   size: 'large',
-                  prefix: <LockOutlined className={styles.prefixIcon} />,
+                  prefix: <LockOutlined />,
                 }}
                 captchaProps={{
                   size: 'large',
@@ -265,7 +335,7 @@ const Login: React.FC = () => {
                   const result = await getFakeCaptcha({
                     phone,
                   });
-                  if (result === false) {
+                  if (!result) {
                     return;
                   }
                   message.success('获取验证码成功！验证码为：1234');
@@ -281,7 +351,7 @@ const Login: React.FC = () => {
             <ProFormCheckbox noStyle name="autoLogin">
               <FormattedMessage id="pages.login.rememberMe" defaultMessage="自动登录" />
             </ProFormCheckbox>
-            <Popover placement="bottom" content={forgePwdPoverContent} trigger="['hover','click']">
+            <Popover placement="bottom" content={forgePwdPoverContent} trigger={['hover', 'click']}>
               <a
                 style={{
                   float: 'right',

@@ -1,5 +1,6 @@
 import { PageContainer } from '@ant-design/pro-components';
-import { Card } from 'antd';
+import { useModel } from '@umijs/max';
+import { Card, theme } from 'antd';
 import React from 'react';
 
 /**
@@ -13,17 +14,21 @@ const InfoCard: React.FC<{
   desc: string;
   href: string;
 }> = ({ title, href, index, desc }) => {
+  const { useToken } = theme;
+
+  const { token } = useToken();
+
   return (
     <div
       style={{
-        backgroundColor: '#FFFFFF',
-        boxShadow: '0 2px 4px 0 rgba(35,49,128,0.02), 0 4px 8px 0 rgba(49,69,179,0.02)',
+        backgroundColor: token.colorBgContainer,
+        boxShadow: token.boxShadow,
         borderRadius: '8px',
         fontSize: '14px',
-        color: 'rgba(0,0,0,0.65)',
-        textAlign: 'justify',
-        lineHeight: ' 22px',
+        color: token.colorTextSecondary,
+        lineHeight: '22px',
         padding: '16px 19px',
+        minWidth: '220px',
         flex: 1,
       }}
     >
@@ -53,7 +58,7 @@ const InfoCard: React.FC<{
         <div
           style={{
             fontSize: '16px',
-            color: 'rgba(0, 0, 0, 0.85)',
+            color: token.colorText,
             paddingBottom: 8,
           }}
         >
@@ -63,7 +68,7 @@ const InfoCard: React.FC<{
       <div
         style={{
           fontSize: '14px',
-          color: 'rgba(0,0,0,0.65)',
+          color: token.colorTextSecondary,
           textAlign: 'justify',
           lineHeight: '22px',
           marginBottom: 8,
@@ -79,6 +84,8 @@ const InfoCard: React.FC<{
 };
 
 const Welcome: React.FC = () => {
+  const { token } = theme.useToken();
+  const { initialState } = useModel('@@initialState');
   return (
     <PageContainer>
       <Card
@@ -87,7 +94,9 @@ const Welcome: React.FC = () => {
         }}
         bodyStyle={{
           backgroundImage:
-            'radial-gradient(circle at 97% 10%, #EBF2FF 0%, #F5F8FF 28%, #EBF1FF 124%)',
+            initialState?.settings?.navTheme === 'realDark'
+              ? 'background-image: linear-gradient(75deg, #1A1B1F 0%, #191C1F 100%)'
+              : 'background-image: linear-gradient(75deg, #FBFDFF 0%, #F5F7FF 100%)',
         }}
       >
         <div
@@ -102,15 +111,15 @@ const Welcome: React.FC = () => {
           <div
             style={{
               fontSize: '20px',
-              color: '#1A1A1A',
+              color: token.colorTextHeading,
             }}
           >
             欢迎使用 Ant Design Pro
           </div>
-          {/* <p
+          <p
             style={{
               fontSize: '14px',
-              color: 'rgba(0,0,0,0.65)',
+              color: token.colorTextSecondary,
               lineHeight: '22px',
               marginTop: 16,
               marginBottom: 32,
@@ -119,14 +128,15 @@ const Welcome: React.FC = () => {
           >
             Ant Design Pro 是一个整合了 umi，Ant Design 和 ProComponents
             的脚手架方案。致力于在设计规范和基础组件的基础上，继续向上构建，提炼出典型模板/业务组件/配套设计资源，进一步提升企业级中后台产品设计研发过程中的『用户』和『设计者』的体验。
-          </p> */}
+          </p>
           <div
             style={{
               display: 'flex',
+              flexWrap: 'wrap',
               gap: 16,
             }}
           >
-            {/* <InfoCard
+            <InfoCard
               index={1}
               href="https://umijs.org/docs/introduce/introduce"
               title="了解 umi"
@@ -143,7 +153,7 @@ const Welcome: React.FC = () => {
               title="了解 Pro Components"
               href="https://procomponents.ant.design"
               desc="ProComponents 是一个基于 Ant Design 做了更高抽象的模板组件，以 一个组件就是一个页面为开发理念，为中后台开发带来更好的体验。"
-            /> */}
+            />
           </div>
         </div>
       </Card>

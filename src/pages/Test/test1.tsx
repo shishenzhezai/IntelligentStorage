@@ -6,7 +6,7 @@ class Demo extends React.Component {
     text: '',
   };
 
-  onTextChange = (event) => {
+  onTextChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     this.setState({ text: event.target.value });
   };
 
@@ -18,7 +18,9 @@ class Demo extends React.Component {
     return (
       <div>
         <MyInput value={this.state.text} onChange={this.onTextChange} />
-        <button onClick={this.onTextReset}>Reset</button>
+        <button type="reset" onClick={this.onTextReset}>
+          Reset
+        </button>
       </div>
     );
   }

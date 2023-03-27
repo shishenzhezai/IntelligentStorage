@@ -1,12 +1,13 @@
-import RightContent from '@/components/RightContent';
+import { Question, SelectLang } from '@/components/RightContent';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
+import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
+import { AvatarDropdown, AvatarName } from './components/RightContent/AvatarDropdown';
 import { errorConfig } from './requestErrorConfig';
 import { currentUser as queryCurrentUser } from './services/ant-design-pro/api';
-
-const isDev = process.env.NODE_ENV === 'development';
+// const isDev = process.env.NODE_ENV === 'development';
 const loginPath = '/user/login';
 
 /**
@@ -30,26 +31,34 @@ export async function getInitialState(): Promise<{
     return undefined;
   };
   // 如果不是登录页面，执行
-  if (window.location.pathname !== loginPath) {
+  const { location } = history;
+  if (location.pathname !== loginPath) {
     const currentUser = await fetchUserInfo();
     return {
       fetchUserInfo,
       currentUser,
-      settings: defaultSettings,
+      settings: defaultSettings as Partial<LayoutSettings>,
     };
   }
   return {
     fetchUserInfo,
-    settings: defaultSettings,
+    settings: defaultSettings as Partial<LayoutSettings>,
   };
 }
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
 export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
   return {
-    rightContentRender: () => <RightContent />,
+    actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" />],
+    avatarProps: {
+      src: initialState?.currentUser?.avatar,
+      title: <AvatarName />,
+      render: (_, avatarChildren) => {
+        return <AvatarDropdown>{avatarChildren}</AvatarDropdown>;
+      },
+    },
     // waterMarkProps: {
-    //   content: initialState?.currentUser?.name,//水印
+    //   content: initialState?.currentUser?.name,
     // },
     // footerRender: () => <Footer />,
     onPageChange: () => {
@@ -91,24 +100,22 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
     // 自定义 403 页面
     // unAccessible: <div>unAccessible</div>,
     // 增加一个 loading 的状态
-    childrenRender: (children, props) => {
+    childrenRender: (children) => {
       // if (initialState?.loading) return <PageLoading />;
       return (
         <>
           {children}
-          {/* {!props.location?.pathname?.includes('/login') && (
-            <SettingDrawer
-              disableUrlParams
-              enableDarkTheme
-              settings={initialState?.settings}
-              onSettingChange={(settings) => {
-                setInitialState((preInitialState) => ({
-                  ...preInitialState,
-                  settings,
-                }));
-              }}
-            />
-          )} */}
+          <SettingDrawer
+            disableUrlParams
+            enableDarkTheme
+            settings={initialState?.settings}
+            onSettingChange={(settings) => {
+              setInitialState((preInitialState) => ({
+                ...preInitialState,
+                settings,
+              }));
+            }}
+          />
         </>
       );
     },

@@ -1,26 +1,11 @@
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
-import { Button } from 'antd';
+import { Button, Modal } from 'antd';
 import React, { useRef, useState } from 'react';
 import request from 'umi-request';
 
-type RoleItem = {
-  Role_Id: number;
-  CreateDate: Date;
-  Creator: string;
-  DeleteBy: string;
-  DeptName: string;
-  Dept_Id: number;
-  Enable: number;
-  Modifier: string;
-  ModifyDate: Date;
-  OrderNo: number;
-  ParentId: number;
-  RoleName: string;
-};
-
-const columns: ProColumns<RoleItem>[] = [
+const columns: ProColumns<SysManage.RoleItem>[] = [
   {
     dataIndex: 'index',
     valueType: 'index',
@@ -92,14 +77,14 @@ const RoleManage: React.FC = () => {
 
   return (
     <div>
-      <ProTable<RoleItem>
+      <ProTable<SysManage.RoleItem>
         columns={columns}
         actionRef={actionRef}
         cardBordered
         request={async (params = {}, sort, filter) => {
           console.log(sort, filter);
           return request<{
-            data: RoleItem[];
+            data: SysManage.RoleItem[];
           }>('http:192.168.1.112:9991/role/getroles', {
             params,
           });
@@ -169,6 +154,7 @@ const RoleManage: React.FC = () => {
           //   </Dropdown>,
         ]}
       />
+      <Modal open={isModalOpen}></Modal>
     </div>
   );
 };
