@@ -54,4 +54,7 @@ export default {
   'menu.hosmanage': '医院管理',
   'menu.hosmanage.bloodbox': '血袋盒管理',
   'menu.hosmanage.bloodfridge': '冰箱管理',
+  'menu.sysmanage': '系统管理',
+  'menu.sysmanage.role': '角色管理',
+  'menu.sysmanage.user': '用户管理',
 };

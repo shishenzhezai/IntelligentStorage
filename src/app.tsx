@@ -1,6 +1,5 @@
 import { Question, SelectLang } from '@/components/RightContent';
 import type { Settings as LayoutSettings } from '@ant-design/pro-components';
-import { SettingDrawer } from '@ant-design/pro-components';
 import type { RunTimeLayoutConfig } from '@umijs/max';
 import { history } from '@umijs/max';
 import defaultSettings from '../config/defaultSettings';
@@ -47,7 +46,7 @@ export async function getInitialState(): Promise<{
 }
 
 // ProLayout 支持的api https://procomponents.ant.design/components/layout
-export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) => {
+export const layout: RunTimeLayoutConfig = ({ initialState }) => {
   return {
     actionsRender: () => [<Question key="doc" />, <SelectLang key="SelectLang" />],
     avatarProps: {
@@ -105,7 +104,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
       return (
         <>
           {children}
-          <SettingDrawer
+          {/* <SettingDrawer
             disableUrlParams
             enableDarkTheme
             settings={initialState?.settings}
@@ -115,7 +114,7 @@ export const layout: RunTimeLayoutConfig = ({ initialState, setInitialState }) =
                 settings,
               }));
             }}
-          />
+          /> */}
         </>
       );
     },

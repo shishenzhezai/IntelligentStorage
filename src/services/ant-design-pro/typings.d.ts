@@ -24,9 +24,12 @@ declare namespace API {
   };
 
   type LoginResult = {
-    status?: string;
+    status?: bool;
     type?: string;
+    message?: string;
     currentAuthority?: string;
+    code?: string;
+    data?: any;
   };
 
   type PageParams = {
@@ -62,10 +65,12 @@ declare namespace API {
   };
 
   type LoginParams = {
-    username?: string;
-    password?: string;
+    UserName?: string;
+    Password?: string;
     autoLogin?: boolean;
     type?: string;
+    VerificationCode: string;
+    UUID: string;
   };
 
   type ErrorResponse = {
@@ -97,5 +102,10 @@ declare namespace API {
     datetime?: string;
     description?: string;
     type?: NoticeIconItemType;
+  };
+
+  type VierificationCode = {
+    img: string;
+    uuid: string;
   };
 }

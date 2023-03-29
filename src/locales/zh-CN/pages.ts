@@ -8,6 +8,7 @@ export default {
   'pages.login.username.required': '用户名是必填项！',
   'pages.login.password.placeholder': '密码:',
   'pages.login.password.required': '密码是必填项！',
+  'pages.login.verificationCode.placeholder': '验证码: ',
   'pages.login.phoneLogin.tab': '手机号登录',
   'pages.login.phoneLogin.errorMessage': '验证码错误',
   'pages.login.phoneNumber.placeholder': '请输入手机号！',

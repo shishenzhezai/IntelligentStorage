@@ -1,5 +1,6 @@
-import { login } from '@/services/ant-design-pro/api';
+import { getVierificationCode, login } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
+import { storage } from '@/utils/utils';
 import { LockOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons';
 import {
   LoginForm,
@@ -10,7 +11,7 @@ import {
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { FormattedMessage, Helmet, history, SelectLang, useIntl, useModel } from '@umijs/max';
 import { Alert, message, Popover, Tabs } from 'antd';
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
 
@@ -83,6 +84,18 @@ const Login: React.FC = () => {
   const [userLoginState, setUserLoginState] = useState<API.LoginResult>({});
   const [type, setType] = useState<string>('account');
   const { initialState, setInitialState } = useModel('@@initialState');
+  const [uuid, setUUID] = useState('');
+  const [img, setImg] = useState<string | undefined>(undefined);
+
+  const GetVierificationCode = async () => {
+    const res = await getVierificationCode();
+    setImg('data:image/png;base64,' + res.img);
+    setUUID(res.uuid);
+  };
+
+  useEffect(() => {
+    GetVierificationCode();
+  }, []);
 
   const containerClassName = useEmotionCss(() => {
     return {
@@ -113,13 +126,15 @@ const Login: React.FC = () => {
   const handleSubmit = async (values: API.LoginParams) => {
     try {
       // 登录
+      values.UUID = uuid;
       const msg = await login({ ...values, type });
-      if (msg.status === 'ok') {
+      if (msg.status) {
         const defaultLoginSuccessMessage = intl.formatMessage({
           id: 'pages.login.success',
           defaultMessage: '登录成功！',
         });
         message.success(defaultLoginSuccessMessage);
+        storage.set({ name: 'token', data: msg.data.token });
         await fetchUserInfo();
         const urlParams = new URL(window.location.href).searchParams;
         history.push(urlParams.get('redirect') || '/');
@@ -128,6 +143,7 @@ const Login: React.FC = () => {
       console.log(msg);
       // 如果失败去设置用户错误信息
       setUserLoginState(msg);
+      GetVierificationCode();
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
         id: 'pages.login.failure',
@@ -135,9 +151,10 @@ const Login: React.FC = () => {
       });
       console.log(error);
       message.error(defaultLoginFailureMessage);
+      GetVierificationCode();
     }
   };
-  const { status, type: loginType } = userLoginState;
+  const { status = true, message: loginMessage, type: loginType } = userLoginState;
 
   return (
     <div className={containerClassName}>
@@ -204,18 +221,19 @@ const Login: React.FC = () => {
             ]}
           />
 
-          {status === 'error' && loginType === 'account' && (
+          {!status && <LoginMessage content={loginMessage ?? ''} />}
+          {/* {!status && loginType === 'account' && (
             <LoginMessage
               content={intl.formatMessage({
                 id: 'pages.login.accountLogin.errorMessage',
                 defaultMessage: '账户或密码错误',
               })}
             />
-          )}
+          )} */}
           {type === 'account' && (
             <>
               <ProFormText
-                name="username"
+                name="UserName"
                 fieldProps={{
                   size: 'large',
                   prefix: <UserOutlined />,
@@ -237,7 +255,7 @@ const Login: React.FC = () => {
                 ]}
               />
               <ProFormText.Password
-                name="password"
+                name="Password"
                 fieldProps={{
                   size: 'large',
                   prefix: <LockOutlined />,
@@ -258,6 +276,33 @@ const Login: React.FC = () => {
                   },
                 ]}
               />
+
+              <ProFormText
+                fieldProps={{
+                  size: 'large',
+                  prefix: <UserOutlined />,
+                }}
+                placeholder={intl.formatMessage({
+                  id: 'pages.login.verificationCode.placeholder',
+                  defaultMessage: '验证码: ',
+                })}
+                name="VerificationCode"
+                colProps={{ xl: 8, md: 12 }}
+                addonAfter={<img src={img} onClick={GetVierificationCode} />}
+                rules={[
+                  {
+                    required: true,
+                    message: (
+                      <FormattedMessage
+                        id="pages.login.captcha.required"
+                        defaultMessage="请输入验证码!"
+                      />
+                    ),
+                  },
+                ]}
+              />
+              {/* <Input style={{ width: '60%' }} /> */}
+              {/* </Form.Item> */}
             </>
           )}
 

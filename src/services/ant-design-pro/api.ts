@@ -6,8 +6,8 @@ import { request } from '@umijs/max';
 export async function currentUser(options?: { [key: string]: any }) {
   return request<{
     data: API.CurrentUser;
-  }>('/api/currentUser', {
-    method: 'GET',
+  }>('/api/User/getCurrentUserInfo', {
+    method: 'post',
     ...(options || {}),
   });
 }
@@ -22,7 +22,7 @@ export async function outLogin(options?: { [key: string]: any }) {
 
 /** 登录接口 POST /api/login/account */
 export async function login(body: API.LoginParams, options?: { [key: string]: any }) {
-  return request<API.LoginResult>('/api/login/account', {
+  return request<API.LoginResult>('/api/User/login', {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json',
@@ -81,5 +81,11 @@ export async function removeRule(options?: { [key: string]: any }) {
   return request<Record<string, any>>('/api/rule', {
     method: 'DELETE',
     ...(options || {}),
+  });
+}
+
+export async function getVierificationCode() {
+  return request<API.VierificationCode>('/api/User/getVierificationCode', {
+    method: 'GET',
   });
 }
