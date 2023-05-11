@@ -1,6 +1,6 @@
 import { getVierificationCode, login } from '@/services/ant-design-pro/api';
 import { getFakeCaptcha } from '@/services/ant-design-pro/login';
-import { storage } from '@/utils/utils';
+import { storage } from '@/services/utils';
 import { LockOutlined, MobileOutlined, UserOutlined } from '@ant-design/icons';
 import {
   LoginForm,

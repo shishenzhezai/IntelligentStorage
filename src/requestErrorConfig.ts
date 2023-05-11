@@ -1,4 +1,4 @@
-﻿import { storage } from '@/utils/utils';
+﻿import { storage } from '@/services/utils';
 import type { RequestOptions } from '@@/plugin-request/request';
 import type { RequestConfig } from '@umijs/max';
 import { message, notification } from 'antd';
@@ -91,7 +91,10 @@ export const errorConfig: RequestConfig = {
     (config: RequestOptions) => {
       // 拦截请求配置，进行个性化处理。
       const url = config?.url;
-      config.headers = { ['Authorization']: 'Bearer ' + storage.get('token') };
+      config.headers = {
+        ...config.headers,
+        Authorization: 'Bearer ' + storage.get('token'),
+      };
       return { ...config, url };
     },
   ],

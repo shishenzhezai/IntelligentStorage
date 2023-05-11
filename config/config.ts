@@ -1,12 +1,13 @@
+// @ts-ignore
+/* eslint-disable */
 // https://umijs.org/config/
 import { defineConfig } from '@umijs/max';
-import { join } from 'path';
 import defaultSettings from './defaultSettings';
 import proxy from './proxy';
 import routes from './routes';
 
 const { REACT_APP_ENV = 'dev' } = process.env;
-console.log('REACT_APP_ENV as keyof typeof proxy', REACT_APP_ENV as keyof typeof proxy);
+
 export default defineConfig({
   /**
    * @name 开启 hash 模式
@@ -138,15 +139,16 @@ export default defineConfig({
     {
       requestLibPath: "import { request } from '@umijs/max'",
       // 或者使用在线的版本
-      // schemaPath: "https://gw.alipayobjects.com/os/antfincdn/M%24jrzTTYJN/oneapi.json"
-      schemaPath: join(__dirname, 'oneapi.json'),
+      schemaPath: 'http:192.168.1.121:9991/swagger/v1/swagger.json',
+      // schemaPath: join(__dirname, 'oneapi.json'),
+      projectName: 'swagger',
       mock: false,
     },
-    {
-      requestLibPath: "import { request } from '@umijs/max'",
-      schemaPath: 'http:192.168.1.112:9991/openapi.json',
-      projectName: 'swagger',
-    },
+    // {
+    //   requestLibPath: "import { request } from '@umijs/max'",
+    //   schemaPath: 'http:192.168.1.112:9991/openapi.json',
+    //   projectName: 'swagger',
+    // },
   ],
   mfsu: {
     strategy: 'normal',
