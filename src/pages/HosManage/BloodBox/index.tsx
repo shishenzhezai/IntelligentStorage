@@ -1,26 +1,24 @@
-import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
-import type { ActionType, ProColumns } from '@ant-design/pro-components';
+import { PlusOutlined } from '@ant-design/icons';
+import {
+  ActionType,
+  ProColumns,
+  ProForm,
+  ProFormDependency,
+  ProFormDigit,
+  ProFormSelect,
+  ProFormSlider,
+  ProFormSwitch,
+  ProFormText,
+} from '@ant-design/pro-components';
 import { ProTable, TableDropdown } from '@ant-design/pro-components';
-import { Button, Dropdown } from 'antd';
-import React, { useRef } from 'react';
+import { Button, Modal, message } from 'antd';
+import React, { useRef, useState } from 'react';
 
 import styles from './index.less';
+import { getSearchParameters } from '@/services/utils';
+import { getBloodBoxList } from '@/services/HosManage/bloodBox';
 
-type BloodBoxItem = {
-  boxid: number;
-  rfid: string;
-  mintemp: number;
-  maxtemp: number;
-  temp: number;
-  islock: number;
-  isout: number;
-  status: number;
-  batterypower: number;
-  ischarge: number;
-  isalert: number;
-};
-
-const columns: ProColumns<BloodBoxItem>[] = [
+const columns: ProColumns<HosManage.BloodBoxItem>[] = [
   {
     dataIndex: 'index',
     valueType: 'indexBorder',
@@ -31,15 +29,6 @@ const columns: ProColumns<BloodBoxItem>[] = [
     dataIndex: 'rfid',
     copyable: true,
     ellipsis: true,
-    // tip: '标题过长会自动收缩',
-    // formItemProps: {
-    //   rules: [
-    //     {
-    //       required: true,
-    //       message: '此项为必填项',
-    //     },
-    //   ],
-    // },
   },
   {
     title: '温度',
@@ -120,87 +109,192 @@ const columns: ProColumns<BloodBoxItem>[] = [
 
 const BloodBox: React.FC = () => {
   const actionRef = useRef<ActionType>();
-  const addBox_btn = () => {};
+  const [modalProps, setModalProps] = useState<Storage.ModalProps>({
+    title: '',
+    isModalOpen: false,
+  });
+
+  const handleOk = () => {};
+
+  const handleCancel = () => {
+    setModalProps({ ...modalProps, isModalOpen: false });
+  };
 
   return (
-    <ProTable<BloodBoxItem>
-      columns={columns}
-      actionRef={actionRef}
-      cardBordered
-      request={async (params = {}, sort, filter) => {
-        console.log(sort, filter);
-        return request<{
-          data: BloodBoxItem[];
-        }>('https://192.168.1.112/github/issues', {
-          params,
-        });
-      }}
-      editable={{
-        type: 'multiple',
-      }}
-      columnsState={{
-        persistenceKey: 'pro-table-singe-demos',
-        persistenceType: 'localStorage',
-        onChange(value) {
-          console.log('value: ', value);
-        },
-      }}
-      rowKey="id"
-      search={{
-        labelWidth: 'auto',
-      }}
-      options={{
-        setting: {
-          listsHeight: 400,
-        },
-      }}
-      form={{
-        // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-        syncToUrl: (values, type) => {
-          if (type === 'get') {
-            return {
-              ...values,
-              created_at: [values.startTime, values.endTime],
-            };
+    <div>
+      <ProTable<HosManage.BloodBoxItem>
+        columns={columns}
+        actionRef={actionRef}
+        cardBordered
+        request={async (params = {}, sort, filter) => {
+          const { current, pageSize, ...rest } = params;
+          console.log(sort, filter);
+          let wheres = getSearchParameters<HosManage.BloodBoxItem>(rest, columns);
+          let queryConditions: Storage.requestItem = {
+            Page: current ?? 1,
+            Rows: pageSize ?? 50,
+            // sort: "Remark",
+            // order: "desc",
+            Wheres: JSON.stringify(wheres),
+          };
+          return getBloodBoxList(queryConditions).then(
+            (value: Storage.PageData) => {
+              if (value && value.status === 0) {
+                return { data: value.rows, success: true, total: value.total ?? 0 };
+              } else {
+                message.error(value.msg);
+                return { data: [], success: false, total: 0 };
+              }
+            },
+            () => {
+              message.error('获取血袋盒数据列表失败');
+              return { data: [], success: false, total: 0 };
+            },
+          );
+        }}
+        editable={{
+          type: 'multiple',
+        }}
+        columnsState={{
+          persistenceKey: 'blood-box-list-table',
+          persistenceType: 'sessionStorage',
+          // onChange(value) {
+          //   console.log('value: ', value);
+          // },
+        }}
+        rowKey="id"
+        search={{
+          labelWidth: 'auto',
+        }}
+        options={{
+          setting: {
+            listsHeight: 400,
+          },
+        }}
+        form={
+          {
+            // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
           }
-          return values;
-        },
-      }}
-      pagination={{
-        pageSize: 5,
-        onChange: (page) => console.log(page),
-      }}
-      dateFormatter="string"
-      headerTitle="血袋盒列表"
-      toolBarRender={() => [
-        <Button key="button" icon={<PlusOutlined />} type="primary" onClick={addBox_btn}>
-          新建
-        </Button>,
-        <Dropdown
-          key="menu"
-          menu={{
-            items: [
-              {
-                label: '1st item',
-                key: '1',
-              },
-              {
-                label: '2nd item',
-                key: '1',
-              },
-              {
-                label: '3rd item',
-                key: '1',
-              },
-            ],
+        }
+        pagination={{
+          showSizeChanger: true,
+        }}
+        dateFormatter="string"
+        headerTitle="血袋盒列表"
+        toolBarRender={() => [
+          <Button
+            key="button"
+            icon={<PlusOutlined />}
+            type="primary"
+            onClick={() => setModalProps({ ...modalProps, isModalOpen: true })}
+          >
+            新增
+          </Button>,
+        ]}
+      />
+      <Modal
+        title={modalProps.title}
+        open={modalProps.isModalOpen}
+        onOk={handleOk}
+        onCancel={handleCancel}
+        width={1000}
+        centered
+      >
+        <ProForm<HosManage.BloodBoxItem>
+          // layout="horizontal"  // 布局(label和文本框显示在同一行)
+          onFinish={async (values: any) => {
+            console.log(values);
+            message.success('提交成功');
           }}
         >
-          <Button>
-            <EllipsisOutlined />
-          </Button>
-        </Dropdown>,
-      ]}
-    />
+          <ProForm.Group>
+            <ProFormText
+              width="md"
+              name="RFID"
+              label="rfid"
+              // tooltip="最长为 24 位"
+              placeholder=""
+            />
+            <ProFormDigit
+              width="md"
+              name="temp"
+              label="当前温度"
+              min={-273.15}
+              placeholder=""
+              fieldProps={{ addonAfter: '℃' }}
+            />
+          </ProForm.Group>
+          <ProFormDependency name={['mintemp', 'maxtemp']}>
+            {({ mintemp, maxtemp }) => (
+              <ProForm.Group>
+                <ProFormDigit
+                  name="mintemp"
+                  width="md"
+                  label="最低温度(℃)"
+                  min={-273.15}
+                  max={maxtemp}
+                  placeholder=""
+                  fieldProps={{ addonAfter: '℃' }}
+                  rules={[
+                    { required: true },
+                    // ({ getFieldValue }) => ({
+                    // validator(_, value) {
+                    //   if (
+                    //     !value ||
+                    //     getFieldValue('maxtemp') >= value ||
+                    //     !maxtemp ||
+                    //     maxtemp === 0
+                    //   ) {
+                    //     console.log('maxtemp', maxtemp);
+                    //     return Promise.resolve();
+                    //   }
+                    //   return Promise.reject(
+                    //     new Error(`最低温度必须小于最高温度${maxtemp || ''}℃`),
+                    //   );
+                    // },
+                    // }),
+                  ]}
+                />
+                <ProFormDigit
+                  width="md"
+                  name="maxtemp"
+                  label="最高温度(℃)"
+                  min={mintemp}
+                  fieldProps={{ addonAfter: '℃' }}
+                  placeholder=""
+                  rules={[
+                    { required: true },
+                    // ({ getFieldValue }) => ({
+                    //   validator(_, value) {
+                    //     if (
+                    //       !value ||
+                    //       getFieldValue('mintemp') <= value ||
+                    //       !mintemp ||
+                    //       mintemp === 0
+                    //     ) {
+                    //       return Promise.resolve();
+                    //     }
+                    //     return Promise.reject(
+                    //       new Error(`最高温度必须大于最低温度${mintemp || ''}℃`),
+                    //     );
+                    //   },
+                    // }),
+                  ]}
+                />
+              </ProForm.Group>
+            )}
+          </ProFormDependency>
+          <ProForm.Group>
+            <ProFormSwitch name="islock" label="是否锁定" />
+            <ProFormSwitch name="isout" label="是否出库" />
+            <ProFormSwitch name="ischarge" label="是否充电" />
+            <ProFormSwitch name="isalert" label="是否报警" />
+            <ProFormSlider name="batterypower" label="电池电量" />
+          </ProForm.Group>
+          <ProFormSelect name="status" label="状态" />
+        </ProForm>
+      </Modal>
+    </div>
   );
 };
 

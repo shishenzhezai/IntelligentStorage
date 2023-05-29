@@ -1,4 +1,5 @@
 import { getRoleList } from '@/services/SysManage/role';
+import { getSearchParameters } from '@/services/utils';
 import { PlusOutlined } from '@ant-design/icons';
 import type { ActionType, ProColumns, ProFormInstance } from '@ant-design/pro-components';
 import { ProTable } from '@ant-design/pro-components';
@@ -94,40 +95,31 @@ const RoleManage: React.FC = () => {
         cardBordered
         request={async (params = {}, sort, filter) => {
           console.log('sort', sort, 'filter', filter, 'params', params);
-          // console.log(rolelistFormRef?.current?.getFieldsValue());
-          let queryFormData = rolelistFormRef?.current?.getFieldsValue();
-          let wheres: { name: string; value: unknown }[] = [];
-          let entries = Object.entries(queryFormData);
-          entries.forEach(([key, value]) => {
-            if (value) {
-              wheres.push({ name: key, value: value });
-            }
-          });
-
-          let queryConditions: SysManage.requestItem = {
-            Page: params.current ?? 1,
-            Rows: params.pageSize ?? 50,
+          const { current, pageSize, ...rest } = params;
+          let wheres = getSearchParameters<SysManage.RoleItem>(rest, columns);
+          let queryConditions: Storage.requestItem = {
+            Page: current ?? 1,
+            Rows: pageSize ?? 50,
             Wheres: JSON.stringify(wheres),
           };
           return getRoleList(queryConditions).then(
-            (value: SysManage.PageData) => {
+            (value: Storage.PageData) => {
               if (value && value.status === 0) {
                 return { data: value.rows, success: true, total: value.total ?? 0 };
               } else {
                 message.error(value.msg);
+                return { data: [], success: false, total: 0 };
               }
             },
             () => {
               message.error('获取角色列表失败');
+              return { data: [], success: false, total: 0 };
             },
           );
         }}
         columnsState={{
           persistenceKey: 'role-list-pro-table',
           persistenceType: 'sessionStorage',
-          onChange(value) {
-            console.log('columnsState value: ', value);
-          },
         }}
         rowKey="Role_Id"
         search={{
@@ -139,18 +131,6 @@ const RoleManage: React.FC = () => {
           },
         }}
         formRef={rolelistFormRef}
-        // form={{
-        //   // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-        //   syncToUrl: (values, type) => {
-        //     if (type === 'get') {
-        //       return {
-        //         ...values,
-        //         created_at: [values.startTime, values.endTime],
-        //       };
-        //     }
-        //     return values;
-        //   },
-        // }}
         pagination={{
           pageSize: 10,
         }}

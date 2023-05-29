@@ -1,4 +1,4 @@
-import { ParamsType, ProColumns } from '@ant-design/pro-components';
+import { ProColumns } from '@ant-design/pro-components';
 import moment from 'moment';
 
 export const storage = {
@@ -31,15 +31,13 @@ const isEmptyValue = (value: any) => {
 };
 
 export const getSearchParameters = <T>(
-  params: ParamsType & {
-    pageSize?: number | undefined;
-    current?: number | undefined;
+  rest: {
+    [x: string]: any;
     keyword?: string | undefined;
   },
   columns: ProColumns<T>[],
 ): Utils.FieldData[] => {
   let wheres: Utils.FieldData[] = [];
-  const { ...rest } = params;
   Object.entries(rest).map(([name, value]) => {
     const fieldInstance = columns.find((col) => col.dataIndex === name && col.search !== false);
     const fieldType = fieldInstance?.valueType;

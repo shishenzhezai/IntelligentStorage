@@ -1,4 +1,4 @@
-import { EllipsisOutlined, PlusOutlined } from '@ant-design/icons';
+import { PlusOutlined } from '@ant-design/icons';
 import {
   ActionType,
   EditableProTable,
@@ -6,43 +6,12 @@ import {
   ProTable,
   TableDropdown,
 } from '@ant-design/pro-components';
-import { Button, Card, Dropdown, Form, Input, Modal } from 'antd';
+import { Button, Card, Col, Form, Input, Modal, Row } from 'antd';
 import React, { useRef, useState } from 'react';
 import styles from './index.less';
+import type { TableRowSelection } from 'antd/es/table/interface';
 
-const waitTime = (time: number = 100) => {
-  return new Promise((resolve) => {
-    setTimeout(() => {
-      resolve(true);
-    }, time);
-  });
-};
-
-type BloodBoxItem = {
-  boxid: number;
-  rfid: string;
-  mintemp: number;
-  maxtemp: number;
-  temp: number;
-  islock: number;
-  isout: number;
-  status: number;
-  batterypower: number;
-  ischarge: number;
-  isalert: number;
-};
-
-type BloodItem = {
-  xxh: string;
-  aboxx: string;
-  rhxx: string;
-  cpm: string; // 产品码
-  xpz: string; //血品种
-  dw: string; //单位
-  sl: string; //数量
-};
-
-const defaultBoxData: BloodBoxItem[] = [
+const defaultBoxData: HosManage.BloodBoxItem[] = [
   {
     boxid: 1,
     rfid: '001',
@@ -84,7 +53,7 @@ const defaultBoxData: BloodBoxItem[] = [
   },
 ];
 
-const columnsBloodBoxItem: ProColumns<BloodBoxItem>[] = [
+const columnsBloodBoxItem: ProColumns<HosManage.BloodBoxItem>[] = [
   {
     dataIndex: 'boxid',
     valueType: 'index',
@@ -95,15 +64,6 @@ const columnsBloodBoxItem: ProColumns<BloodBoxItem>[] = [
     dataIndex: 'rfid',
     copyable: true,
     ellipsis: true,
-    // tip: '标题过长会自动收缩',
-    // formItemProps: {
-    //   rules: [
-    //     {
-    //       required: true,
-    //       message: '此项为必填项',
-    //     },
-    //   ],
-    // },
   },
   {
     title: '温度',
@@ -176,10 +136,10 @@ const columnsBloodBoxItem: ProColumns<BloodBoxItem>[] = [
     ],
   },
 ];
-const columnsBloodItem: ProColumns<BloodItem>[] = [
+const columnsBloodItem: ProColumns<KeepStorage.BloodItem>[] = [
   {
     dataIndex: 'boxid',
-    valueType: 'indexBorder',
+    valueType: 'index',
     width: 48,
   },
   {
@@ -282,19 +242,19 @@ const BloodPacking: React.FC = () => {
 
   const setDataSource = () => {};
 
-  const rowSelection = {
-    onChange: (selectedRowKeys: React.Key[], selectedRows: DataType[]) => {
+  const rowSelection: TableRowSelection<HosManage.BloodBoxItem> = {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: HosManage.BloodBoxItem[]) => {
       console.log(`selectedRowKeys: ${selectedRowKeys}`, 'selectedRows: ', selectedRows);
     },
-    getCheckboxProps: (record: DataType) => ({
-      disabled: record.name === 'Disabled User', // Column configuration not to be checked
-      name: record.name,
+    getCheckboxProps: (record: HosManage.BloodBoxItem) => ({
+      disabled: record.status === 1, // Column configuration not to be checked
+      name: record.boxid.toString(),
     }),
   };
 
   return (
     <div>
-      <ProTable<BloodBoxItem>
+      <ProTable<HosManage.BloodBoxItem>
         columns={columnsBloodBoxItem}
         actionRef={actionRef}
         search={false}
@@ -303,7 +263,7 @@ const BloodPacking: React.FC = () => {
         request={async (params = {}, sort, filter) => {
           console.log(sort, filter);
           return request<{
-            data: BloodBoxItem[];
+            data: HosManage.BloodBoxItem[];
           }>('https://192.168.1.112/github/issues', {
             params,
           });
@@ -328,21 +288,8 @@ const BloodPacking: React.FC = () => {
             listsHeight: 400,
           },
         }}
-        // form={{
-        //   // 由于配置了 transform，提交的参与与定义的不同这里需要转化一下
-        //   syncToUrl: (values, type) => {
-        //     if (type === 'get') {
-        //       return {
-        //         ...values,
-        //         created_at: [values.startTime, values.endTime],
-        //       };
-        //     }
-        //     return values;
-        //   },
-        // }}
         pagination={{
-          pageSize: 5,
-          onChange: (page) => console.log(page),
+          showSizeChanger: true,
         }}
         dateFormatter="string"
         headerTitle="血袋盒列表"
@@ -350,33 +297,10 @@ const BloodPacking: React.FC = () => {
           <Button key="button" icon={<PlusOutlined />} type="primary" onClick={bloodInS_btn}>
             血袋入库
           </Button>,
-          <Dropdown
-            key="menu"
-            menu={{
-              items: [
-                {
-                  label: '1st item',
-                  key: '1',
-                },
-                {
-                  label: '2nd item',
-                  key: '1',
-                },
-                {
-                  label: '3rd item',
-                  key: '1',
-                },
-              ],
-            }}
-          >
-            <Button>
-              <EllipsisOutlined />
-            </Button>
-          </Dropdown>,
         ]}
       />
 
-      <ProTable<BloodItem>
+      <ProTable<KeepStorage.BloodItem>
         columns={columnsBloodItem}
         actionRef={actionRef}
         search={false}
@@ -401,44 +325,44 @@ const BloodPacking: React.FC = () => {
           onFinishFailed={onFinishFailed}
           autoComplete="off"
         >
-          <Form.Item label="RFID" name="rfid" rules={[{ required: true, message: '请输入rfid!' }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item label="RFID" name="rfid" rules={[{ required: true, message: '请输入rfid!' }]}>
-            <Input />
-          </Form.Item>
+          <Row>
+            <Col>
+              <Form.Item
+                label="RFID"
+                name="rfid"
+                rules={[{ required: true, message: '请输入rfid!' }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+            <Col>
+              <Form.Item
+                label="RFID"
+                name="rfid"
+                rules={[{ required: true, message: '请输入rfid!' }]}
+              >
+                <Input />
+              </Form.Item>
+            </Col>
+          </Row>
         </Form>
         <Card>
-          <EditableProTable<BloodItem>
+          <EditableProTable<KeepStorage.BloodItem>
             rowKey="id"
             headerTitle="血袋信息"
             maxLength={5}
             scroll={{
               x: 960,
             }}
-            // recordCreatorProps={
-            //   position !== 'hidden'
-            //     ? {
-            //         position: position as 'top',
-            //         record: () => ({ id: (Math.random() * 1000000).toFixed(0) }),
-            //       }
-            //     : false
-            // }
             loading={false}
             toolBarRender={() => []}
             columns={columnsBloodItem}
-            request={async () => ({
-              data: defaultData,
-              total: 3,
-              success: true,
-            })}
             onChange={setDataSource}
             editable={{
               type: 'multiple',
               editableKeys,
               onSave: async (rowKey, data, row) => {
                 console.log(rowKey, data, row);
-                await waitTime(2000);
               },
               onChange: setEditableRowKeys,
             }}

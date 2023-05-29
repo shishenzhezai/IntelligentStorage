@@ -97,14 +97,17 @@ const UserManage: React.FC = () => {
         cardBordered
         request={async (params = {}, sort, filter) => {
           console.log('sort', sort, 'filter', filter, 'params', params);
-          let wheres = getSearchParameters<SysManage.UserItem>(params, columns);
-          let queryConditions: SysManage.requestItem = {
-            Page: params.current ?? 1,
-            Rows: params.pageSize ?? 50,
+          const { current, pageSize, ...rest } = params;
+          let wheres = getSearchParameters<SysManage.UserItem>(rest, columns);
+          let queryConditions: Storage.requestItem = {
+            Page: current ?? 1,
+            Rows: pageSize ?? 50,
+            // sort: "Remark",
+            // order: "desc",
             Wheres: JSON.stringify(wheres),
           };
           return getUserList(queryConditions).then(
-            (value: SysManage.PageData) => {
+            (value: Storage.PageData) => {
               if (value && value.status === 0) {
                 return { data: value.rows, success: true, total: value.total ?? 0 };
               } else {
@@ -119,7 +122,7 @@ const UserManage: React.FC = () => {
           );
         }}
         columnsState={{
-          persistenceKey: 'role-list-pro-table',
+          persistenceKey: 'user-list-pro-table',
           persistenceType: 'sessionStorage',
           // onChange(value) {
           //   console.log('columnsState value: ', value);

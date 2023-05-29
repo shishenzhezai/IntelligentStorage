@@ -6,12 +6,13 @@ import {
   LoginForm,
   ProFormCaptcha,
   ProFormCheckbox,
+  ProFormInstance,
   ProFormText,
 } from '@ant-design/pro-components';
 import { useEmotionCss } from '@ant-design/use-emotion-css';
 import { FormattedMessage, Helmet, history, SelectLang, useIntl, useModel } from '@umijs/max';
 import { Alert, message, Popover, Tabs } from 'antd';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { flushSync } from 'react-dom';
 import Settings from '../../../../config/defaultSettings';
 
@@ -86,6 +87,8 @@ const Login: React.FC = () => {
   const { initialState, setInitialState } = useModel('@@initialState');
   const [uuid, setUUID] = useState('');
   const [img, setImg] = useState<string | undefined>(undefined);
+  const formRef = useRef<ProFormInstance<API.LoginParams>>();
+  // const formRef = useRef<ProFormInstance<API.LoginParams>>();
 
   const GetVierificationCode = async () => {
     const res = await getVierificationCode();
@@ -143,6 +146,15 @@ const Login: React.FC = () => {
       console.log(msg);
       // 如果失败去设置用户错误信息
       setUserLoginState(msg);
+      if (msg.message === '验证码不正确' || msg.message === '验证码已失效') {
+        console.log(formRef);
+        formRef?.current?.setFieldsValue({
+          ...values,
+          VerificationCode: '',
+        });
+
+        document.getElementById('VerificationCode')?.focus();
+      }
       GetVierificationCode();
     } catch (error) {
       const defaultLoginFailureMessage = intl.formatMessage({
@@ -185,6 +197,7 @@ const Login: React.FC = () => {
           initialValues={{
             autoLogin: true,
           }}
+          formRef={formRef}
           actions={
             [
               // <FormattedMessage
